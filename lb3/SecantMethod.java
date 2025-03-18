@@ -94,6 +94,22 @@ public class SecantMethod {
             System.out.println("Разболтовка началась на " + harwikResult.iterations + " итерации");
             System.out.println(
                     "Интервал неопределенности: [" + harwikResult.interval.a + ", " + harwikResult.interval.b + "]");
+
+            System.out.println("----------------------------------------");
+
+            System.out.println("  eps   |  delta  |        x0          | N |   ν_Δ   |    ν");
+
+            for (double eps = 0.00001; eps < 1; eps *= 10) {
+                Result res = solve(eps);
+
+                delta = Math.abs(Function.f(res.interval.b) - Function.f(res.interval.a));
+                double nu = eps / delta;
+                double nu_delta = Math.abs(1 / Math.abs(Function.firstDerivative(res.root)));
+
+                System.out.printf("%.5f | %.5f | %.16f | %d | %.5f | %.5f%n",
+                        eps, delta, res.root, res.iterations, nu_delta, nu);
+            }
+
         } catch (SecantMethodException e) {
             System.err.println(e.getMessage());
         }
