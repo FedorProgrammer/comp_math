@@ -16,10 +16,15 @@ public class NewtonMethod {
                     Function.LEFT_BOUND + " до " + Function.RIGHT_BOUND);
         }
 
+        if (Function.f(x0) * Function.secondDerivative(x0) < 0) {
+            throw new NewtonMethodException(
+                    "Начальное приближения корня не удовелтворяет требованиям: f(x0) * f''(x0) < 0");
+        }
+
         double epsilon = Math.sqrt(2 * eps * Function.FIRST_DERIVATIVE_MIN / Function.SECOND_DERIVATIVE_MAX);
 
         int iteration = 0;
-        
+
         double x = x0;
         double xNext;
         double diff;
@@ -45,6 +50,11 @@ public class NewtonMethod {
         if (x0 < Function.LEFT_BOUND || x0 > Function.RIGHT_BOUND) {
             throw new NewtonMethodException("Начальное приближение должно быть в пределах от " +
                     Function.LEFT_BOUND + " до " + Function.RIGHT_BOUND);
+        }
+
+        if (Function.f(x0) * Function.secondDerivative(x0) < 0) {
+            throw new NewtonMethodException(
+                    "Начальное приближения корня не удовелтворяет требованиям: f(x0) * f''(x0) < 0");
         }
 
         int iteration = 0;
@@ -76,7 +86,7 @@ public class NewtonMethod {
     }
 
     public static void main(String[] args) {
-        double initialGuess = 0.7;
+        double initialGuess = 0.73;
         double epsilon = 1e-6;
         int N = 100;
 
@@ -107,7 +117,7 @@ public class NewtonMethod {
 
             System.out.println("----------------------------------------");
 
-            System.out.println("  eps   |  delta  |        x0          | N |   ν_Δ   |    ν");
+            System.out.println("  eps   |  delta  |        x0          | N |   ν_Δ   |    ν      | обусловленность");
 
             for (double eps = 0.00001; eps < 1; eps *= 10) {
                 Result res = solve(initialGuess, eps);
@@ -115,9 +125,9 @@ public class NewtonMethod {
                 delta = Math.abs(Function.f(res.interval.b) - Function.f(res.interval.a));
                 double nu = eps / delta;
                 double nu_delta = Math.abs(1 / Math.abs(Function.firstDerivative(res.root)));
-                
-                System.out.printf("%.5f | %.5f | %.16f | %d | %.5f | %.5f%n", 
-                  eps, delta, res.root, res.iterations, nu_delta, nu);
+
+                System.out.printf("%.5f | %.5f | %.16f | %d | %.5f | %.5f   | %s%n",
+                        eps, delta, res.root, res.iterations, nu_delta, nu, nu < nu_delta ? "хорошая" : "плохая");
             }
 
         } catch (NewtonMethodException e) {
