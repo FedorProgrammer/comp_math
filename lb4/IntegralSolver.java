@@ -8,6 +8,10 @@ import java.util.function.Function;
  */
 
 public class IntegralSolver {
+
+    public static double M2 = 1; // abs
+    public static double M4 = 3;
+
     public static double f(double x) {
         double term = -Math.pow(x, 2) / 2;
 
@@ -90,18 +94,37 @@ public class IntegralSolver {
     }
 
     public static void main(String[] args) {
-        int a = 0;
-        int b = 1;
+        double a = 0;
+        double b = 1;
         int count = 10;
 
         InitData data = new InitData(a, b, count);
 
         double epsilon = 1e-3; // epsilon issue (runge isn't working)
+        double h = Math.abs(b - a) / count;
 
         System.out.println("Результат вычисления опрделенного интеграла: ");
         System.out.println("1) методом прямоугольников: " + rect(data));
         System.out.println("2) методом трапеций: " + trap(data));
         System.out.println("3) методом Симпсона: " + simps(data));
+
+        System.out.println("----------------------------------------");
+
+        double rectCoef = M2 * (b - a) / 24;
+        double trapCoef = M2 * (b - a) / 12;
+        double simpsCoef = M4 * (b - a) / 2880;
+
+        System.out.println("Априорные погрешности: ");
+        System.out.println("1) для метода прямоугольников: " + rectCoef * Math.pow(h, 2));
+        System.out.println("2) для метода трапеций: " + trapCoef * Math.pow(h, 2));
+        System.out.println("3) для метода Симпсона: " + simpsCoef * Math.pow(h, 4));
+
+        System.out.println("----------------------------------------");
+
+        System.out.println("Максимальные оценки h: ");
+        System.out.println("1) для метода прямоугольников: " + Math.sqrt(epsilon / rectCoef));
+        System.out.println("2) для метода трапеций: " + Math.sqrt(epsilon / trapCoef));
+        System.out.println("3) для метода Симпосна: " + Math.sqrt(Math.sqrt(epsilon / simpsCoef)));
 
         System.out.println("----------------------------------------");
 
