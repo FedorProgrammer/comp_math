@@ -63,7 +63,7 @@ public class IntegralSolver {
         return I;
     }
 
-    public static void runge(Function<InitData, Double> method, int k, InitData data, double epsilon) {
+    public static double runge(Function<InitData, Double> method, int k, InitData data, double epsilon) {
         InitData dataH = new InitData(data);
 
         double I_h = method.apply(dataH);
@@ -91,6 +91,7 @@ public class IntegralSolver {
         System.out.println("     I_result      |      h_result    ");
         System.out.printf("%.16f | %.16f%n", currentI_h, h);
 
+        return currentError;
     }
 
     public static void main(String[] args) {
@@ -131,19 +132,25 @@ public class IntegralSolver {
         System.out.println("Оценка по Рунге погрешности для метода прямоугольников: ");
         System.out.println("----------------------------------------");
 
-        runge(IntegralSolver::rect, 2, data, epsilon);
+        double rectPosteriori = runge(IntegralSolver::rect, 2, data, epsilon);
 
         System.out.println("----------------------------------------");
         System.out.println("Оценка по Рунге погрешности для метода трапеций: ");
         System.out.println("----------------------------------------");
 
-        runge(IntegralSolver::trap, 2, data, epsilon);
+        double trapPosteriori = runge(IntegralSolver::trap, 2, data, epsilon);
 
         System.out.println("----------------------------------------");
         System.out.println("Оценка по Рунге погрешности для метода Симпсона: ");
         System.out.println("----------------------------------------");
 
-        runge(IntegralSolver::simps, 4, data, epsilon);
+        double simpsPosteriori = runge(IntegralSolver::simps, 4, data, epsilon);
+
+        System.out.println("----------------------------------------");
+        System.out.println("Апостериорные погрешности: ");
+        System.out.println("1) для метода прямоугольников: " + rectPosteriori);
+        System.out.println("2) для метода трапеций: " + trapPosteriori);
+        System.out.println("3) для метода Симпсона: " + simpsPosteriori);
 
     }
 }
