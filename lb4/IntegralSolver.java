@@ -1,15 +1,8 @@
 import java.util.function.Function;
 
-/*
- * Задание: вычислить определенный интеграл
- * границы области интегрирования: [a, b] = [0, 1]
- * количество частей интервала интегрирования: 10
- * точность eps = 0.001
- */
-
 public class IntegralSolver {
 
-    public static double M2 = 1; // abs
+    public static double M2 = 1;
     public static double M4 = 3;
 
     public static double f(double x) {
@@ -76,7 +69,9 @@ public class IntegralSolver {
         double currentI_05h = I_05h;
         double currentError = Math.abs((currentI_05h - currentI_h) / (Math.pow(2, k) - 1));
 
-        while (currentError >= epsilon) {
+        double prevError = Double.POSITIVE_INFINITY;
+
+        while (currentError >= epsilon && currentError < prevError) {
             System.out.printf("%.16f | %.16f%n", currentI_h, h);
 
             dataH.count *= 2;
@@ -84,6 +79,8 @@ public class IntegralSolver {
             h = Math.abs(dataH.b - dataH.a) / dataH.count;
             currentI_h = currentI_05h;
             currentI_05h = method.apply(new InitData(dataH.a, dataH.b, 2 * dataH.count));
+
+            prevError = currentError;
             currentError = Math.abs((currentI_05h - currentI_h) / (Math.pow(2, k) - 1));
         }
 
@@ -101,10 +98,10 @@ public class IntegralSolver {
 
         InitData data = new InitData(a, b, count);
 
-        double epsilon = 1e-3; // epsilon issue (runge isn't working)
+        double epsilon = 1e-3;
         double h = Math.abs(b - a) / count;
 
-        System.out.println("Результат вычисления опрделенного интеграла: ");
+        System.out.println("Результат вычисления определенного интеграла: ");
         System.out.println("1) методом прямоугольников: " + rect(data));
         System.out.println("2) методом трапеций: " + trap(data));
         System.out.println("3) методом Симпсона: " + simps(data));
