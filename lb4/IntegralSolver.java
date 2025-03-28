@@ -56,7 +56,7 @@ public class IntegralSolver {
         return I;
     }
 
-    public static double runge(Function<InitData, Double> method, int k, InitData data, double epsilon) {
+    public static ResultData runge(Function<InitData, Double> method, int k, InitData data, double epsilon) {
         InitData dataH = new InitData(data);
 
         double I_h = method.apply(dataH);
@@ -88,7 +88,7 @@ public class IntegralSolver {
         System.out.println("     I_result      |      h_result    ");
         System.out.printf("%.16f | %.16f%n", currentI_05h, h / 2);
 
-        return currentError;
+        return new ResultData(currentI_05h, currentError);
     }
 
     public static void main(String[] args) {
@@ -98,15 +98,8 @@ public class IntegralSolver {
 
         InitData data = new InitData(a, b, count);
 
-        double epsilon = 1e-3;
+        double epsilon = 1e-12;
         double h = Math.abs(b - a) / count;
-
-        System.out.println("Результат вычисления определенного интеграла: ");
-        System.out.println("1) методом прямоугольников: " + rect(data));
-        System.out.println("2) методом трапеций: " + trap(data));
-        System.out.println("3) методом Симпсона: " + simps(data));
-
-        System.out.println("----------------------------------------");
 
         double rectCoef = M2 * (b - a) / 24;
         double trapCoef = M2 * (b - a) / 12;
@@ -129,25 +122,31 @@ public class IntegralSolver {
         System.out.println("Оценка по Рунге погрешности для метода прямоугольников: ");
         System.out.println("----------------------------------------");
 
-        double rectPosteriori = runge(IntegralSolver::rect, 2, data, epsilon);
+        ResultData rectPosteriori = runge(IntegralSolver::rect, 2, data, epsilon);
 
         System.out.println("----------------------------------------");
         System.out.println("Оценка по Рунге погрешности для метода трапеций: ");
         System.out.println("----------------------------------------");
 
-        double trapPosteriori = runge(IntegralSolver::trap, 2, data, epsilon);
+        ResultData trapPosteriori = runge(IntegralSolver::trap, 2, data, epsilon);
 
         System.out.println("----------------------------------------");
         System.out.println("Оценка по Рунге погрешности для метода Симпсона: ");
         System.out.println("----------------------------------------");
 
-        double simpsPosteriori = runge(IntegralSolver::simps, 4, data, epsilon);
+        ResultData simpsPosteriori = runge(IntegralSolver::simps, 4, data, epsilon);
 
         System.out.println("----------------------------------------");
         System.out.println("Апостериорные погрешности: ");
-        System.out.println("1) для метода прямоугольников: " + rectPosteriori);
-        System.out.println("2) для метода трапеций: " + trapPosteriori);
-        System.out.println("3) для метода Симпсона: " + simpsPosteriori);
+        System.out.println("1) для метода прямоугольников: " + rectPosteriori.error);
+        System.out.println("2) для метода трапеций: " + trapPosteriori.error);
+        System.out.println("3) для метода Симпсона: " + simpsPosteriori.error);
+
+        System.out.println("----------------------------------------");
+        System.out.println("Итоговые значения интеграла: ");
+        System.out.printf("1) для метода прямоугольников: %.16f%n", rectPosteriori.I + rectPosteriori.error);
+        System.out.printf("2) для метода трапеций: %.16f%n", rectPosteriori.I + rectPosteriori.error);
+        System.out.printf("3) для метода Симпсона: %.16f%n", rectPosteriori.I + rectPosteriori.error);
 
     }
 }
