@@ -86,7 +86,7 @@ public class IntegralSolver {
 
         System.out.println("----------------------------------------");
         System.out.println("     I_result      |      h_result    ");
-        System.out.printf("%.16f | %.16f%n", currentI_h, h);
+        System.out.printf("%.16f | %.16f%n", currentI_05h, h / 2);
 
         return currentError;
     }
