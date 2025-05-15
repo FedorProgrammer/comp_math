@@ -6,15 +6,6 @@ public class Solver {
     private static double[][] originalA;
     private static double[] originalB;
 
-    private static void fill(double[][] matrix, double[] vectorB, int var) {
-        for (int i = 0; i < matrix[0].length; i++) {
-            for (int j = 0; j < matrix.length; j++) {
-                matrix[j][i] = Math.random() + (Math.random() * 10) + var;
-            }
-            vectorB[i] = Math.random() + (Math.random() * 10) + var;
-        }
-    }
-
     private static double[][] deepCopy(double[][] src) {
         int cols = src.length, rows = src[0].length;
         double[][] dst = new double[cols][rows];
@@ -46,56 +37,16 @@ public class Solver {
         return vectorErr;
     }
 
-    public static double determinant(double[][] matrix) {
-        int n = matrix.length;
-        if (matrix.length != matrix[0].length) {
-            throw new IllegalArgumentException("Матрица должна быть квадратной!");
-        }
-
-        if (n == 1)
-            return matrix[0][0];
-
-        double det = 0.0;
-        for (int c = 0; c < n; c++) {
-            double[][] minor = new double[n - 1][n - 1];
-            for (int i = 1; i < n; i++) {
-                int colIndex = 0;
-                for (int j = 0; j < n; j++) {
-                    if (j == c)
-                        continue;
-                    minor[colIndex++][i - 1] = matrix[j][i];
-                }
+    private static void fill(double[][] matrix, double[] vectorB, int var) {
+        for (int i = 0; i < matrix[0].length; i++) {
+            for (int j = 0; j < matrix.length; j++) {
+                matrix[j][i] = Math.random() + (Math.random() * 10) + var;
             }
-            det += Math.pow(-1, c) * matrix[c][0] * determinant(minor);
+            vectorB[i] = Math.random() + (Math.random() * 10) + var;
         }
-
-        return det;
     }
 
-    public static double[] cramer(double[][] matrix, double[] vectorB) {
-        if (check(matrix)) {
-            throw new IllegalArgumentException("Вырожденная матрица!");
-        }
-
-        double det = determinant(matrix);
-        double[] x = new double[matrix.length];
-
-        for (int i = 0; i < matrix.length; i++) {
-            double[] temp = matrix[i];
-            matrix[i] = vectorB;
-
-            x[i] = determinant(matrix) / det;
-            matrix[i] = temp;
-        }
-
-        return x;
-    }
-
-    public static boolean check(double[][] matrix) {
-        return determinant(matrix) == 0.0;
-    }
-
-    public static double norm(double[] vecor) {
+    private static double norm(double[] vecor) {
         double result = 0.0;
         for (int i = 0; i < vecor.length; i++) {
             result += Math.abs(vecor[i]);
@@ -104,7 +55,7 @@ public class Solver {
         return result;
     }
 
-    public static double norm(double[][] matrix) {
+    private static double norm(double[][] matrix) {
         double result = Double.NEGATIVE_INFINITY;
         for (int i = 0; i < matrix.length; i++) {
             result = Math.max(result, norm(matrix[i]));
@@ -113,69 +64,8 @@ public class Solver {
         return result;
     }
 
-    public static double[][] getInverse(double[][] matrix) {
-        if (matrix.length != matrix[0].length) {
-            throw new IllegalArgumentException("Матрица должна быть квадратной!");
-        }
-
-        if (check(matrix)) {
-            throw new IllegalArgumentException("Вырожденная матрица!");
-        }
-
-        int n = matrix.length;
-
-        double[][] aug = new double[2 * n][n];
-        for (int j = 0; j < n; j++) {
-            for (int i = 0; i < n; i++) {
-                aug[j][i] = matrix[j][i];
-            }
-        }
-
-        for (int j = n; j < 2 * n; j++) {
-            for (int i = 0; i < n; i++) {
-                aug[j][i] = (j - n == i) ? 1.0 : 0.0;
-            }
-        }
-
-        for (int i = 0; i < n; i++) {
-            int maxRow = i;
-            for (int k = i + 1; k < n; k++) {
-                if (Math.abs(aug[i][k]) > Math.abs(aug[i][maxRow])) {
-                    maxRow = k;
-                }
-            }
-
-            if (maxRow != i) {
-                for (int j = 0; j < 2 * n; j++) {
-                    double tmp = aug[j][i];
-                    aug[j][i] = aug[j][maxRow];
-                    aug[j][maxRow] = tmp;
-                }
-            }
-
-            double div = aug[i][i];
-            for (int j = 0; j < 2 * n; j++) {
-                aug[j][i] /= div;
-            }
-
-            for (int k = 0; k < n; k++) {
-                if (k == i)
-                    continue;
-                double factor = aug[i][k];
-                for (int j = 0; j < 2 * n; j++) {
-                    aug[j][k] -= factor * aug[j][i];
-                }
-            }
-        }
-
-        double[][] inversed = new double[n][n];
-        for (int j = 0; j < n; j++) {
-            for (int i = 0; i < n; i++) {
-                inversed[j][i] = aug[j + n][i];
-            }
-        }
-
-        return inversed;
+    private static boolean check(double[][] matrix) {
+        return determinant(matrix) == 0.0;
     }
 
     public static double[] mulMatrixVector(double[][] matrix, double[] vector) {
@@ -253,18 +143,6 @@ public class Solver {
         return res;
     }
 
-    public static double absoluteConditionNumber(double[][] matrix) {
-        return norm(getInverse(matrix));
-    }
-
-    public static double relativeConditionNumber(double[][] matrix, double[] vectorB) {
-        return norm(getInverse(matrix)) * (norm(vectorB) / norm(cramer(matrix, vectorB)));
-    }
-
-    public static double standardConditionNumber(double[][] matrix) {
-        return norm(getInverse(matrix)) * norm(matrix);
-    }
-
     public static void show(double[][] matrix, double[] vectorB) {
         int n = matrix[0].length;
         for (int i = 0; i < n; i++) {
@@ -290,6 +168,128 @@ public class Solver {
             System.out.printf(" %.8f%s ", vector[i], (i == n - 1 ? "" : ","));
         }
         System.out.printf(")^T%n");
+    }
+
+    public static double determinant(double[][] matrix) {
+        int n = matrix.length;
+        if (matrix.length != matrix[0].length) {
+            throw new IllegalArgumentException("Матрица должна быть квадратной!");
+        }
+
+        if (n == 1)
+            return matrix[0][0];
+
+        double det = 0.0;
+        for (int c = 0; c < n; c++) {
+            double[][] minor = new double[n - 1][n - 1];
+            for (int i = 1; i < n; i++) {
+                int colIndex = 0;
+                for (int j = 0; j < n; j++) {
+                    if (j == c)
+                        continue;
+                    minor[colIndex++][i - 1] = matrix[j][i];
+                }
+            }
+            det += Math.pow(-1, c) * matrix[c][0] * determinant(minor);
+        }
+
+        return det;
+    }
+
+    public static double[] cramer(double[][] matrix, double[] vectorB) {
+        if (check(matrix)) {
+            throw new IllegalArgumentException("Вырожденная матрица!");
+        }
+
+        double det = determinant(matrix);
+        double[] x = new double[matrix.length];
+
+        for (int i = 0; i < matrix.length; i++) {
+            double[] temp = matrix[i];
+            matrix[i] = vectorB;
+
+            x[i] = determinant(matrix) / det;
+            matrix[i] = temp;
+        }
+
+        return x;
+    }
+
+    public static double[][] getInverse(double[][] matrix) {
+        if (matrix.length != matrix[0].length) {
+            throw new IllegalArgumentException("Матрица должна быть квадратной!");
+        }
+
+        if (check(matrix)) {
+            throw new IllegalArgumentException("Вырожденная матрица!");
+        }
+
+        int n = matrix.length;
+
+        double[][] aug = new double[2 * n][n];
+        for (int j = 0; j < n; j++) {
+            for (int i = 0; i < n; i++) {
+                aug[j][i] = matrix[j][i];
+            }
+        }
+
+        for (int j = n; j < 2 * n; j++) {
+            for (int i = 0; i < n; i++) {
+                aug[j][i] = (j - n == i) ? 1.0 : 0.0;
+            }
+        }
+
+        for (int i = 0; i < n; i++) {
+            int maxRow = i;
+            for (int k = i + 1; k < n; k++) {
+                if (Math.abs(aug[i][k]) > Math.abs(aug[i][maxRow])) {
+                    maxRow = k;
+                }
+            }
+
+            if (maxRow != i) {
+                for (int j = 0; j < 2 * n; j++) {
+                    double tmp = aug[j][i];
+                    aug[j][i] = aug[j][maxRow];
+                    aug[j][maxRow] = tmp;
+                }
+            }
+
+            double div = aug[i][i];
+            for (int j = 0; j < 2 * n; j++) {
+                aug[j][i] /= div;
+            }
+
+            for (int k = 0; k < n; k++) {
+                if (k == i)
+                    continue;
+                double factor = aug[i][k];
+                for (int j = 0; j < 2 * n; j++) {
+                    aug[j][k] -= factor * aug[j][i];
+                }
+            }
+        }
+
+        double[][] inversed = new double[n][n];
+        for (int j = 0; j < n; j++) {
+            for (int i = 0; i < n; i++) {
+                inversed[j][i] = aug[j + n][i];
+            }
+        }
+
+        return inversed;
+    }
+
+    public static double absoluteConditionNumber(double[][] matrix) {
+        return norm(getInverse(matrix));
+    }
+
+    public static double relativeConditionNumber(double[][] matrix, double[] vectorB) {
+        return norm(getInverse(matrix)) * (norm(vectorB) / norm(cramer(matrix, vectorB)));
+    }
+
+    public static double standardConditionNumber(double[][] matrix) {
+        return norm(getInverse(matrix)) * norm(matrix);
     }
 
     public static void solve(double[][] matrixA, double[] vectorB, boolean checkError) {
