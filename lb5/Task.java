@@ -168,8 +168,8 @@ public class Task {
     }
 
     // Проверка степени корреляции
-    public static boolean isCorrelationMajor(double r, int n) {
-        return Math.abs(r) * Math.sqrt(n - 1) >= 3;
+    public static double isCorrelationMajor(double r, int n) {
+        return Math.abs(r) * Math.sqrt(n - 1);
     }
 
     // Линейная регрессия y = a*x + b
@@ -309,7 +309,7 @@ public class Task {
         System.out.printf("Дисперсия Y = %.16f%n", variance(Y));
         System.out.printf("Ковариация = %.16f%n", covariance(X, Y));
         System.out.printf("Корреляция = %.16f%n", correlation(X, Y));
-        System.out.printf("Зависит ли X от Y? %b%n", isCorrelationMajor(correlation(X, Y), X.length));
+        System.out.printf("Зависит ли X от Y? %b (r*sqrt(19) = %f)%n", isCorrelationMajor(correlation(X, Y), X.length) < 3 ? true : false, isCorrelationMajor(correlation(X, Y), X.length));
 
         System.out.println("--------------------------------");
     }
